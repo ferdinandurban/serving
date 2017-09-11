@@ -76,6 +76,7 @@ limitations under the License.
 #include "tensorflow_serving/servables/tensorflow/multi_inference.h"
 #include "tensorflow_serving/servables/tensorflow/predict_impl.h"
 #include "tensorflow_serving/servables/tensorflow/regression_service.h"
+#include "tensorflow_serving/servables/tensorflow/server_impl.h"
 
 namespace grpc {
 class ServerCompletionQueue;
@@ -97,6 +98,7 @@ using tensorflow::serving::TensorflowRegressionServiceImpl;
 using tensorflow::serving::TensorflowPredictor;
 using tensorflow::serving::UniquePtrWithDeps;
 using tensorflow::string;
+using tensorflow::serving::ServerManagementImpl;
 
 using grpc::InsecureServerCredentials;
 using grpc::Server;
@@ -265,6 +267,18 @@ class PredictionServiceImpl final : public PredictionService::Service {
     if (!status.ok()) {
       VLOG(1) << "MultiInference request failed: " << status.error_message();
     }
+    return status;
+  }
+
+  grpc::Status GetModelMetadata(ServerContext* context,
+                                const ServerSpecRequest* request,
+                                ServerSpecResponse* response) override {
+    const grpc::Status status = ToGRPCStatus(ServerManagementImpl::GetServerModels( core_.get(), *request, response));
+    
+    if (!status.ok()) {
+      VLOG(1) << "ServerSpec failed: " << status.error_message();
+    }
+    
     return status;
   }
 

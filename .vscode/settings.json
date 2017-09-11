@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        ".pylintrc": "ini",
+        "limits": "cpp"
+    }
+}
