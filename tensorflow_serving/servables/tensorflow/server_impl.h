@@ -1,5 +1,5 @@
-#ifndef TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_PREDICT_IMPL_H_
-#define TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_PREDICT_IMPL_H_
+#ifndef TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_SERVER_IMPL_H_
+#define TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_SERVER_IMPL_H_
 
 #include "tensorflow/core/lib/core/status.h"
 #include "tensorflow/core/protobuf/config.pb.h"
@@ -9,7 +9,6 @@
 namespace tensorflow {
 namespace serving {
 
-// Utility methods for implementation of PredictionService::Predict.
 class ServerManagementImpl {
  public:
   
@@ -23,4 +22,4 @@ class ServerManagementImpl {
 }  // namespace serving
 }  // namespace tensorflow
 
-#endif  // TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_PREDICT_IMPL_H_
+#endif  // TENSORFLOW_SERVING_SERVABLES_TENSORFLOW_SERVER_IMPL_H_
