@@ -12,8 +12,9 @@ namespace serving {
 class ServerManagementImpl {
  public:
   
-  Status GetServerModels(const RunOptions& run_options, ServerCore* core,
-                 const ServerSpecRequest& request, ServerSpecResponse* response);
+  Status GetServerModels(ServerCore* core,
+                        const ServerSpecRequest& request, 
+                        ServerSpecResponse* response);
 
  private:
   
