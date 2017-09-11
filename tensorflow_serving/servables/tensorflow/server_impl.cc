@@ -25,7 +25,7 @@ Status ValidateServerRequest(const ServerSpecRequest& request) {
 
 Status ServerManagementImpl::GetServerModels( ServerCore* core, const ServerSpecRequest& request, ServerSpecResponse* response) {
   TF_RETURN_IF_ERROR(ValidateServerRequest(request));
-  const std::vector<ServableId> available_servables = server_core->ListAvailableServableIds();
+  const std::vector<ServableId> available_servables = core->ListAvailableServableIds();
   std::vector<string> result;
 
   for (const auto& servable : available_servables) {
