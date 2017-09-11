@@ -120,6 +120,24 @@ serving_proto_library_py(
 )
 
 serving_proto_library(
+    name = "server_proto",
+    srcs = ["server.proto"],
+    cc_api_version = 2,
+    go_api_version = 2,
+    java_api_version = 2,
+    deps = [
+        "@protobuf_archive//:cc_wkt_protos",
+    ],
+)
+
+serving_proto_library_py(
+    name = "server_proto_py_pb2",
+    srcs = ["server.proto"],
+    proto_library = "server_proto",
+    deps = [],
+)
+
+serving_proto_library(
     name = "prediction_service_proto",
     srcs = ["prediction_service.proto"],
     has_services = 1,
