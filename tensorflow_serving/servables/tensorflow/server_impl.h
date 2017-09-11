@@ -13,7 +13,7 @@ class ServerManagementImpl {
  public:
   
   Status GetServerModels(const RunOptions& run_options, ServerCore* core,
-                 const ServerSpecRequest& request, ServerSpecREsponse* response);
+                 const ServerSpecRequest& request, ServerSpecResponse* response);
 
  private:
   
