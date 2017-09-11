@@ -17,7 +17,7 @@ namespace serving {
 
 namespace {
 
-Status ValidateServerRequest(const ServerRequest& request) {
+Status ValidateServerRequest(const ServerSpecRequest& request) {
   return tensorflow::Status::OK();
 }
 
