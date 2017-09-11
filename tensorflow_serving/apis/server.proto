@@ -9,5 +9,5 @@ message ServerSpecRequest {
   string input = 1;
 }
 message ServerSpecResponse {
-  repeated string outputs = 1;
+  string outputs = 1;
 }
