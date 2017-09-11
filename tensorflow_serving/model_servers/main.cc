@@ -115,6 +115,8 @@ using tensorflow::serving::PredictResponse;
 using tensorflow::serving::RegressionRequest;
 using tensorflow::serving::RegressionResponse;
 using tensorflow::serving::PredictionService;
+using tensorflow::serving::ServerSpecRequest;
+using tensorflow::serving::ServerSpecResponse;
 
 namespace {
 
@@ -270,7 +272,7 @@ class PredictionServiceImpl final : public PredictionService::Service {
     return status;
   }
 
-  grpc::Status GetModelMetadata(ServerContext* context,
+  grpc::Status GetServerStatus(ServerContext* context,
                                 const ServerSpecRequest* request,
                                 ServerSpecResponse* response) override {
     const grpc::Status status = ToGRPCStatus(ServerManagementImpl::GetServerModels( core_.get(), *request, response));
