@@ -28,11 +28,13 @@ Status ServerManagementImpl::GetServerModels( ServerCore* core, const ServerSpec
   const std::vector<ServableId> available_servables = core->ListAvailableServableIds();
   std::vector<string> result;
 
+  auto models = response->mutable_outputs();
   for (const auto& servable : available_servables) {
     result.push_back(servable.name);
     std::cout << servable.name << std::endl;
   }
   
+  models->mutable_outputs()->set_value(result);
   
   
   return tensorflow::Status::OK();
