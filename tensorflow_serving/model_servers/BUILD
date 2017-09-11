@@ -120,6 +120,7 @@ TENSORFLOW_DEPS = [
     "//tensorflow_serving/servables/tensorflow:saved_model_bundle_source_adapter",
     "//tensorflow_serving/servables/tensorflow:session_bundle_source_adapter",
     "//tensorflow_serving/servables/tensorflow:predict_impl",
+    "//tensorflow_serving/servables/tensorflow:server_impl",
 ]
 
 cc_binary(
