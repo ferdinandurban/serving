@@ -11,7 +11,7 @@ namespace serving {
 class ServerManagementImpl {
  public:
   
-  Status GetServerModels(ServerCore* core,
+  static Status GetServerModels(ServerCore* core,
                         const ServerSpecRequest& request, 
                         ServerSpecResponse* response);
 
