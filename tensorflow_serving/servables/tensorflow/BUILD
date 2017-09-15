@@ -484,14 +484,14 @@ cc_test(
 )
 
 cc_library(
-    name = "server_impl",
-    srcs = ["server_impl.cc"],
-    hdrs = ["server_impl.h"],
+    name = "model_info_impl",
+    srcs = ["model_info_impl.cc"],
+    hdrs = ["model_info_impl.h"],
     visibility = [
         "//visibility:public",
     ],
     deps = [
-        "//tensorflow_serving/apis:server_proto",
+        "//tensorflow_serving/apis:model_info_proto",
         "//tensorflow_serving/core:servable_handle",
         "//tensorflow_serving/model_servers:server_core",
         "@org_tensorflow//tensorflow/cc/saved_model:loader",

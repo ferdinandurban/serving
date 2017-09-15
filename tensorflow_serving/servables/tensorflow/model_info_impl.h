@@ -8,12 +8,12 @@
 namespace tensorflow {
 namespace serving {
 
-class ServerManagementImpl {
+class ModelInfoImpl {
  public:
   
-  static Status GetServerModels(ServerCore* core,
-                        const ServerSpecRequest& request, 
-                        ServerSpecResponse* response);
+  static Status GetModelInfo(ServerCore* core,
+                        const ModelInfoRequest& request, 
+                        ModelInfoResponse* response);
 
  private:
   

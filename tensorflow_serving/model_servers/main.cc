@@ -76,7 +76,7 @@ limitations under the License.
 #include "tensorflow_serving/servables/tensorflow/multi_inference.h"
 #include "tensorflow_serving/servables/tensorflow/predict_impl.h"
 #include "tensorflow_serving/servables/tensorflow/regression_service.h"
-#include "tensorflow_serving/servables/tensorflow/server_impl.h"
+#include "tensorflow_serving/servables/tensorflow/model_info_impl.h"
 
 namespace grpc {
 class ServerCompletionQueue;
@@ -115,8 +115,8 @@ using tensorflow::serving::PredictResponse;
 using tensorflow::serving::RegressionRequest;
 using tensorflow::serving::RegressionResponse;
 using tensorflow::serving::PredictionService;
-using tensorflow::serving::ServerSpecRequest;
-using tensorflow::serving::ServerSpecResponse;
+using tensorflow::serving::ModelInfoRequest;
+using tensorflow::serving::ModelInfoResponse;
 
 namespace {
 
@@ -272,13 +272,13 @@ class PredictionServiceImpl final : public PredictionService::Service {
     return status;
   }
 
-  grpc::Status GetServerStatus(ServerContext* context,
-                                const ServerSpecRequest* request,
-                                ServerSpecResponse* response) override {
-    const grpc::Status status = ToGRPCStatus(ServerManagementImpl::GetServerModels( core_.get(), *request, response));
+  grpc::Status GetModelInfo(ServerContext* context,
+                                const ModelInfoRequest* request,
+                                ModelInfoResponse* response) override {
+    const grpc::Status status = ToGRPCStatus(ModelInfoImpl::GetModelInfo( core_.get(), *request, response));
     
     if (!status.ok()) {
-      VLOG(1) << "ServerSpec failed: " << status.error_message();
+      VLOG(1) << "ModelInfo failed: " << status.error_message();
     }
     
     return status;
