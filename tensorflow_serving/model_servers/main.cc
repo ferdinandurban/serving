@@ -98,7 +98,7 @@ using tensorflow::serving::TensorflowRegressionServiceImpl;
 using tensorflow::serving::TensorflowPredictor;
 using tensorflow::serving::UniquePtrWithDeps;
 using tensorflow::string;
-using tensorflow::serving::ServerManagementImpl;
+using tensorflow::serving::ModelInfoImpl;
 
 using grpc::InsecureServerCredentials;
 using grpc::Server;
