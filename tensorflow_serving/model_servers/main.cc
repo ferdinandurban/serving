@@ -273,8 +273,8 @@ class PredictionServiceImpl final : public PredictionService::Service {
   }
 
   grpc::Status GetModelInfo(ServerContext* context,
-                                const ModelInfoRequest* request,
-                                ModelInfoResponse* response) override {
+                            const ModelInfoRequest* request,
+                            ModelInfoResponse* response) override {
     const grpc::Status status = ToGRPCStatus(ModelInfoImpl::GetModelInfo( core_.get(), *request, response));
     
     if (!status.ok()) {
