@@ -1,0 +1,27 @@
+commit 75287c4e42e9c7e607fa8c020e2f662dd6491caa
+Author: ferdinand.urban@konicaminolta.cz <ferda@rd-dl1.bic.local>
+Date:   Mon Sep 11 14:30:43 2017 +0200
+
+    first working response for server status request...
+
+diff --git a/tensorflow_serving/servables/tensorflow/server_impl.cc b/tensorflow_serving/servables/tensorflow/server_impl.cc
+index 3db47b3..7727294 100644
+--- a/tensorflow_serving/servables/tensorflow/server_impl.cc
++++ b/tensorflow_serving/servables/tensorflow/server_impl.cc
+@@ -34,12 +34,12 @@ Status ServerManagementImpl::GetServerModels( ServerCore* core, const ServerSpec
+   for (const auto& servable : available_servables) {
+     result.push_back(servable.name);
+ 
+-    output.append(servable.name);
+-    output.append(",")
++    models->append(servable.name);
++    models->append(",");
+   }
+   
+-  std::cout << output << std::endl;
+-  models->mutable_outputs()->set_value(output);
++  //std::cout << output << std::endl;
++  //models(output.c_str());
+   
+   
+   return tensorflow::Status::OK();
