@@ -20,6 +20,8 @@ limitations under the License.
 #include "tensorflow/core/lib/core/status.h"
 #include "tensorflow/core/lib/core/status_test_util.h"
 #include "tensorflow/core/lib/io/path.h"
+#include "tensorflow/core/lib/random/random.h"
+#include "tensorflow/core/lib/strings/stringprintf.h"
 #include "tensorflow_serving/apis/model.pb.h"
 #include "tensorflow_serving/apis/predict.pb.h"
 #include "tensorflow_serving/core/servable_handle.h"
@@ -190,7 +192,6 @@ class RelativePathsServerCoreTest : public ServerCoreTest {
       string* optional_config_list_root_dir = nullptr) {
     using ::tensorflow::io::Basename;
     using ::tensorflow::io::Dirname;
-    using ::tensorflow::io::IsAbsolutePath;
 
     ModelServerConfig result = GetTestModelServerConfigForFakePlatform();
     const string model_name = result.model_config_list().config(0).name();
@@ -198,9 +199,6 @@ class RelativePathsServerCoreTest : public ServerCoreTest {
     ModelConfig& relative =
         *result.mutable_model_config_list()->mutable_config(0);
     relative.set_name(strings::StrCat(model_name, "_relative"));
-    CHECK(IsAbsolutePath(relative.base_path()))
-        << "relative.base_path()=" << relative.base_path()
-        << " must start as an absolute path for this unit-test to work.";
     const string dirname = Dirname(relative.base_path()).ToString();
     const string basename = Basename(relative.base_path()).ToString();
     CHECK(!dirname.empty());
@@ -228,19 +226,28 @@ TEST_P(RelativePathsServerCoreTest, RelativePathFails) {
             CreateServerCore(relative, &server_core).code());
 }
 
-TEST_P(RelativePathsServerCoreTest, AbsolutePathWithOptionsFails) {
+TEST_P(RelativePathsServerCoreTest,
+       AbsoluteAndRelativePathsWithOptionsSucceed) {
   std::unique_ptr<ServerCore> server_core;
+  ModelServerConfig absolute_and_relative;
   ModelServerConfig absolute = GetTestModelServerConfigForFakePlatform();
   ServerCore::Options options = GetDefaultOptions();
   {
     string model_config_list_root_dir;
     ModelServerConfig relative =
         GetTestModelServerConfigWithRelativePath(&model_config_list_root_dir);
+    // Add the absolute and relative config to absolute. We'll check that both
+    // paths can be interleaved in the same model config list.
+    CHECK_GT(relative.model_config_list().config_size(), 0);
+    CHECK_GT(absolute.model_config_list().config_size(), 0);
+    *absolute_and_relative.mutable_model_config_list()->add_config() =
+        absolute.model_config_list().config(0);
+    *absolute_and_relative.mutable_model_config_list()->add_config() =
+        relative.model_config_list().config(0);
     options.model_config_list_root_dir = std::move(model_config_list_root_dir);
   }
-  EXPECT_EQ(
-      error::INVALID_ARGUMENT,
-      CreateServerCore(absolute, std::move(options), &server_core).code());
+  TF_ASSERT_OK(CreateServerCore(absolute_and_relative, std::move(options),
+                                &server_core));
 }
 
 TEST_P(RelativePathsServerCoreTest, AbsolutePathWithEmptyPathFails) {
@@ -287,7 +294,7 @@ TEST_P(ServerCoreTest, ErroringModel) {
   Status status = ServerCore::Create(std::move(options), &server_core);
   EXPECT_FALSE(status.ok());
   EXPECT_THAT(status.ToString(),
-              ::testing::HasSubstr("Some models did not become available"));
+              ::testing::HasSubstr("Some servables did not become available"));
 }
 
 TEST_P(ServerCoreTest, IllegalReconfigurationToCustomConfig) {
@@ -364,8 +371,24 @@ TEST_P(ServerCoreTest, UnknownModelPlatform) {
 
 // Creates a model name that incorporates 'platform'. Useful for tests that have
 // one model for a given platform.
+//
+// The model names contain a random element, to vary the model name sort order
+// independently from the platform name order. This is to get regression
+// coverage of b/65363800. If called twice for a given platform, always returns
+// the same model name.
 string ModelNameForPlatform(const string& platform) {
-  return strings::StrCat("model_for_", platform);
+  static std::map<string, string>* platform_to_model_map = [] {
+    return new std::map<string, string>();
+  }();
+  auto it = platform_to_model_map->find(platform);
+  if (it != platform_to_model_map->end()) {
+    return it->second;
+  }
+  const string random = strings::Printf("%llu", random::New64());
+  const string model_name =
+      strings::StrCat("model_", random, "_for_", platform);
+  (*platform_to_model_map)[platform] = model_name;
+  return model_name;
 }
 
 // Builds a ModelSpec with a model named 'ModelNameForPlatform(platform)' and
@@ -418,8 +441,9 @@ string ServableDataForPlatform(const string& root_path, const string& platform,
 }
 
 TEST_P(ServerCoreTest, MultiplePlatforms) {
-  const string root_path = io::JoinPath(
-      testing::TmpDir(), strings::StrCat("MultiplePlatforms_", GetTestType()));
+  const string root_path =
+      io::JoinPath(testing::TmpDir(),
+                   strings::StrCat("MultiplePlatforms_", GetNameForTestCase()));
   TF_ASSERT_OK(Env::Default()->CreateDir(root_path));
 
   // Create a ServerCore with two platforms, and one model for each platform.
@@ -452,8 +476,8 @@ TEST_P(ServerCoreTest, MultiplePlatforms) {
 
 TEST_P(ServerCoreTest, MultiplePlatformsWithConfigChange) {
   const string root_path = io::JoinPath(
-      testing::TmpDir(),
-      strings::StrCat("MultiplePlatformsWithConfigChange_", GetTestType()));
+      testing::TmpDir(), strings::StrCat("MultiplePlatformsWithConfigChange_",
+                                         GetNameForTestCase()));
   TF_ASSERT_OK(Env::Default()->CreateDir(root_path));
 
   // Create config for three platforms, and one model per platform.
@@ -515,7 +539,7 @@ TEST_P(ServerCoreTest, MultiplePlatformsWithConfigChange) {
 TEST_P(ServerCoreTest, IllegalToChangeModelPlatform) {
   const string root_path = io::JoinPath(
       testing::TmpDir(),
-      strings::StrCat("IllegalToChangeModelPlatform_", GetTestType()));
+      strings::StrCat("IllegalToChangeModelPlatform_", GetNameForTestCase()));
   TF_ASSERT_OK(Env::Default()->CreateDir(root_path));
 
   ServerCore::Options options = GetDefaultOptions();
@@ -613,11 +637,15 @@ TEST_P(ServerCoreTest, RequestLoggingOn) {
 
 INSTANTIATE_TEST_CASE_P(
     TestType, ServerCoreTest,
-    ::testing::Range(0, static_cast<int>(ServerCoreTest::NUM_TEST_TYPES)));
+    ::testing::Combine(
+        ::testing::Range(0, static_cast<int>(ServerCoreTest::NUM_TEST_TYPES)),
+        ::testing::Bool()));
 
 INSTANTIATE_TEST_CASE_P(
     TestType, RelativePathsServerCoreTest,
-    ::testing::Range(0, static_cast<int>(ServerCoreTest::NUM_TEST_TYPES)));
+    ::testing::Combine(
+        ::testing::Range(0, static_cast<int>(ServerCoreTest::NUM_TEST_TYPES)),
+        ::testing::Bool()));
 
 }  // namespace
 }  // namespace serving

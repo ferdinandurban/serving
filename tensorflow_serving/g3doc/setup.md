@@ -6,21 +6,20 @@ To compile and use TensorFlow Serving, you need to set up some prerequisites.
 
 ### Bazel (only if compiling source code)
 
-TensorFlow Serving requires Bazel 0.4.5 or higher. You can find the Bazel
+TensorFlow Serving requires Bazel 0.5.4 or higher. You can find the Bazel
 installation instructions [here](http://bazel.build/docs/install.html).
 
 If you have the prerequisites for Bazel, those instructions consist of the
 following steps:
 
 1.  Download the relevant binary from
-    [here](https://github.com/bazelbuild/bazel/releases).
-    Let's say you downloaded bazel-0.4.5-installer-linux-x86_64.sh. You would
-    execute:
+    [here](https://github.com/bazelbuild/bazel/releases). Let's say you
+    downloaded bazel-0.5.4-installer-linux-x86_64.sh. You would execute:
 
     <pre>
     cd ~/Downloads
-    chmod +x bazel-0.4.5-installer-linux-x86_64.sh
-    ./bazel-0.4.5-installer-linux-x86_64.sh --user
+    chmod +x bazel-0.5.4-installer-linux-x86_64.sh
+    ./bazel-0.5.4-installer-linux-x86_64.sh --user
     </pre>
 
 2.  Set up your environment. Put this in your ~/.bashrc.
@@ -57,6 +56,12 @@ sudo apt-get update && sudo apt-get install -y \
         zip \
         zlib1g-dev
 ```
+
+The list of packages needed to build TensorFlow changes over time, so if you
+encounter any issues, refer TensorFlow's [build
+instructions](https://www.tensorflow.org/install/install_sources). Pay
+particular attention to `apt-get install` and `pip install` commands which you
+may need to run.
 
 ### TensorFlow Serving Python API PIP package
 
